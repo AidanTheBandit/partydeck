@@ -30,8 +30,9 @@ sudo pacman -S prismlauncher
 
 ### 3. Configure the Handler
 
-1. Import this handler into PartyDeck or create a new one
-2. Set the following fields:
+1. Copy `handler.json.template` to `handler.json`
+2. Import the handler into PartyDeck or edit it directly
+3. Set the following fields:
    - **path_gameroot**: Leave empty or set to Prism Launcher's installation directory
    - **exec**: `prismlauncher` (or full path if not in PATH)
    - **args**: `-l <your-instance-name>` (replace with your instance name)
