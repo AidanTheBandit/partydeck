@@ -7,7 +7,7 @@
   "runtime": "",
   "is32bit": false,
   "exec": "prismlauncher",
-  "args": "-l <instance-name>",
+  "args": "-l YOUR_INSTANCE_NAME_HERE",
   "env": "",
   "pause_between_starts": 2.0,
   "use_goldberg": false,
