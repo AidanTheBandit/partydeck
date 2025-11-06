@@ -16,7 +16,7 @@ A split-screen game launcher for Linux/SteamOS
 
 ## Features
 
-- Runs multiple instances of a game at a time and automatically tiles up to 4 game windows per monitor
+- Runs multiple instances of a game at a time and automatically tiles up to 8 game windows per monitor (experimental)
 - Supports native Linux games as well as Windows games through Proton-GE/UMU Launcher
 - Handler system that tells the launcher how to handle game files, meaning very little manual setup is required
 - Steam multiplayer API is emulated, allowing for multiple instances of Steam games
@@ -26,6 +26,7 @@ A split-screen game launcher for Linux/SteamOS
 - Uses sandboxing software to mask out controllers so that each game instance only detects the controller assigned to it, preventing input interference
 - Profile support allows each player to have their own persistent save data, settings, and stats for games
 - Works out of the box on SteamOS
+- Includes handler support for Minecraft via Prism Launcher
 
 ## Installing & Usage
 

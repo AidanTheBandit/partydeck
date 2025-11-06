@@ -30,6 +30,11 @@ pub fn set_instance_resolutions(
                     (basewidth, baseheight / 2)
                 }
             }
+            3 | 4 => (basewidth / 2, baseheight / 2),
+            5 => (basewidth / 3, baseheight / 2),
+            6 => (basewidth / 3, baseheight / 2),
+            7 => (basewidth / 4, baseheight / 2),
+            8 => (basewidth / 4, baseheight / 2),
             _ => (basewidth / 2, baseheight / 2),
         };
         if h < 600 && cfg.gamescope_fix_lowres {
@@ -69,6 +74,11 @@ pub fn set_instance_resolutions_multimonitor(
                     (basewidth, baseheight / 2)
                 }
             }
+            3 | 4 => (basewidth / 2, baseheight / 2),
+            5 => (basewidth / 3, baseheight / 2),
+            6 => (basewidth / 3, baseheight / 2),
+            7 => (basewidth / 4, baseheight / 2),
+            8 => (basewidth / 4, baseheight / 2),
             _ => (basewidth / 2, baseheight / 2),
         };
         if h < 600 && cfg.gamescope_fix_lowres {
