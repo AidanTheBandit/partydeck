@@ -311,6 +311,7 @@ pub fn launch_cmds(
         let path_exec = gamedir.join(exec);
         let cwd = if h.is_flatpak {
             // For Flatpak apps, use home directory as working directory
+            // Flatpak manages its own sandboxing and working directory
             PathBuf::from(&*PATH_HOME)
         } else {
             path_exec.parent().ok_or_else(|| "couldn't get parent")?.to_path_buf()
@@ -319,8 +320,9 @@ pub fn launch_cmds(
 
         // Runtime
         if h.is_flatpak {
-            // For Flatpak applications, use "flatpak run" instead of the direct executable
-            // The exec field contains the Flatpak application ID
+            // For Flatpak applications, the exec field is an app ID (e.g., org.prismlauncher.PrismLauncher)
+            // not a file path, so we use "flatpak run" to launch it
+            // Note: We don't use path_exec here because exec is not a file path
             cmd.arg("flatpak");
             cmd.arg("run");
             cmd.arg(&h.exec);
