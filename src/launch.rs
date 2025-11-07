@@ -131,13 +131,14 @@ pub fn launch_cmds(
         .collect();
 
     for (i, instance) in instances.iter().enumerate() {
-        let gamedir = if h.is_saved_handler() && !cfg.disable_mount_gamedirs {
+        let gamedir = if h.is_saved_handler() && !cfg.disable_mount_gamedirs && !h.is_flatpak {
             PATH_PARTY.join("tmp").join(format!("game-{}", i))
         } else {
             PathBuf::from(h.get_game_rootpath()?)
         };
 
-        if !gamedir.join(exec).exists() {
+        // Skip executable existence check for Flatpak applications
+        if !h.is_flatpak && !gamedir.join(exec).exists() {
             return Err(format!("Executable not found: {}", gamedir.join(exec).display()).into());
         }
 
@@ -308,11 +309,22 @@ pub fn launch_cmds(
         }
 
         let path_exec = gamedir.join(exec);
-        let cwd = path_exec.parent().ok_or_else(|| "couldn't get parent")?;
+        let cwd = if h.is_flatpak {
+            // For Flatpak apps, use home directory as working directory
+            PathBuf::from(&*PATH_HOME)
+        } else {
+            path_exec.parent().ok_or_else(|| "couldn't get parent")?.to_path_buf()
+        };
         cmd.current_dir(cwd);
 
         // Runtime
-        if win {
+        if h.is_flatpak {
+            // For Flatpak applications, use "flatpak run" instead of the direct executable
+            cmd.arg("flatpak");
+            cmd.arg("run");
+            // The exec field contains the Flatpak application ID
+            cmd.arg(&h.exec);
+        } else if win {
             cmd.arg(&*BIN_UMU_RUN);
         } else {
             match runtime {
@@ -328,9 +340,8 @@ pub fn launch_cmds(
                 }
                 _ => {}
             };
+            cmd.arg(&path_exec);
         }
-
-        cmd.arg(&path_exec);
 
         for arg in h.args.split_whitespace() {
             if arg.starts_with("$GAMEDIR") || arg.starts_with("$HANDLERDIR") {
@@ -399,6 +410,11 @@ pub fn fuse_overlayfs_mount_gamedirs(
     h: &Handler,
     instances: &Vec<Instance>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    // Skip mounting for Flatpak applications
+    if h.is_flatpak {
+        return Ok(());
+    }
+
     let tmp_dir = PATH_PARTY.join("tmp");
     let mut path_lowerdir = h.get_game_rootpath()?;
 
