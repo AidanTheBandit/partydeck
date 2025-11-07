@@ -19,6 +19,7 @@ A split-screen game launcher for Linux/SteamOS
 - Runs multiple instances of a game at a time and automatically tiles up to 8 game windows per monitor (experimental)
 - Supports native Linux games as well as Windows games through Proton-GE/UMU Launcher
 - Handler system that tells the launcher how to handle game files, meaning very little manual setup is required
+- Now supports Flatpak applications like Prism Launcher for Minecraft and other 3rd party launchers
 - Steam multiplayer API is emulated, allowing for multiple instances of Steam games
 - Works with most game controllers without any additional setup, drivers, or third-party software
 - Now works with multiple keyboards and mice!
@@ -73,7 +74,7 @@ PartyDeck uses a few software layers to provide a console-like split-screen gami
 
 ## Known Issues, Limitations and To-dos
 
-- AppImages and Flatpaks are not supported yet for native Linux games. Handlers can only run regular executables inside folders.
+- Flatpak support is now available for launchers like Prism Launcher (Minecraft). AppImages are not yet supported for native Linux games.
 - Controller navigation support in the launcher is super primitive; I'd love to try making a more controller-friendly, Big-Picture-style UI in the future, but have no immediate plans for it.
 - Games using Goldberg might have trouble discovering LAN games from other devices. If this happens, you can try adding a firewall rule for port 47584. If connecting two Steam Decks through LAN, their hostnames should be changed from the default "steamdeck".
 

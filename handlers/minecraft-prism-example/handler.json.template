@@ -2,7 +2,7 @@
   "name": "Minecraft (Prism Launcher)",
   "author": "PartyDeck",
   "version": "1.0",
-  "info": "Minecraft Java Edition via Prism Launcher\n\nInstructions:\n1. Install Prism Launcher on your system\n2. Create a Minecraft instance in Prism Launcher\n3. Set 'path_gameroot' to your Prism Launcher installation directory\n4. Set 'exec' to the Prism Launcher executable (e.g., 'prismlauncher')\n5. Set 'args' to launch your instance (e.g., '-l <instance-name>')\n\nNote: You may need to configure each player's instance separately with different save directories.",
+  "info": "Minecraft Java Edition via Prism Launcher\n\nInstructions:\n1. Install Prism Launcher on your system (native or Flatpak)\n2. Create a Minecraft instance in Prism Launcher\n3. For native install:\n   - Set 'exec' to the Prism Launcher executable (e.g., 'prismlauncher')\n   - Set 'is_flatpak' to false\n4. For Flatpak install:\n   - Set 'exec' to the Flatpak app ID (e.g., 'org.prismlauncher.PrismLauncher')\n   - Set 'is_flatpak' to true\n5. Set 'args' to launch your instance (e.g., '-l <instance-name>')\n\nNote: You may need to configure each player's instance separately with different save directories.",
   "path_gameroot": "",
   "runtime": "",
   "is32bit": false,
@@ -12,5 +12,6 @@
   "pause_between_starts": 2.0,
   "use_goldberg": false,
   "steam_appid": null,
-  "game_null_paths": []
+  "game_null_paths": [],
+  "is_flatpak": false
 }

@@ -4,13 +4,16 @@ This handler allows you to run multiple instances of Minecraft Java Edition usin
 
 ## Prerequisites
 
-1. **Prism Launcher** - Install from your distribution's package manager or from [prismlauncher.org](https://prismlauncher.org/)
+1. **Prism Launcher** - Install from your distribution's package manager, Flatpak, or from [prismlauncher.org](https://prismlauncher.org/)
 2. **Minecraft Java Edition** - Set up through Prism Launcher with your desired version and mods
 
 ## Setup Instructions
 
 ### 1. Install Prism Launcher
 
+Choose one of the following installation methods:
+
+#### Native Package
 ```bash
 # Example for Ubuntu/Debian
 sudo apt install prismlauncher
@@ -19,6 +22,17 @@ sudo apt install prismlauncher
 sudo pacman -S prismlauncher
 
 # Or download from https://prismlauncher.org/
+```
+
+#### Flatpak (Recommended for universal compatibility)
+```bash
+# Install Flatpak if not already installed
+sudo apt install flatpak  # Ubuntu/Debian
+# or
+sudo pacman -S flatpak    # Arch Linux
+
+# Install Prism Launcher via Flatpak
+flatpak install flathub org.prismlauncher.PrismLauncher
 ```
 
 ### 2. Create a Minecraft Instance
@@ -32,9 +46,20 @@ sudo pacman -S prismlauncher
 
 1. Copy `handler.json.template` to `handler.json`
 2. Import the handler into PartyDeck or edit it directly
-3. Set the following fields:
-   - **path_gameroot**: Leave empty or set to Prism Launcher's installation directory
+3. Set the following fields based on your installation method:
+
+#### For Native Installation:
    - **exec**: `prismlauncher` (or full path if not in PATH)
+   - **is_flatpak**: `false`
+   - **path_gameroot**: Leave empty
+   - **args**: `-l <your-instance-name>` (replace with your instance name)
+   
+   Example: If your instance is named "Vanilla1.20", use `-l Vanilla1.20`
+
+#### For Flatpak Installation:
+   - **exec**: `org.prismlauncher.PrismLauncher` (the Flatpak app ID)
+   - **is_flatpak**: `true`
+   - **path_gameroot**: Leave empty
    - **args**: `-l <your-instance-name>` (replace with your instance name)
    
    Example: If your instance is named "Vanilla1.20", use `-l Vanilla1.20`

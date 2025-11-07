@@ -35,6 +35,9 @@ pub struct Handler {
     pub steam_appid: Option<u32>,
 
     pub game_null_paths: Vec<String>,
+
+    #[serde(default)]
+    pub is_flatpak: bool,
 }
 
 impl Default for Handler {
@@ -60,6 +63,8 @@ impl Default for Handler {
             steam_appid: None,
 
             game_null_paths: Vec::new(),
+
+            is_flatpak: false,
         }
     }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "Minecraft (Prism Launcher - Flatpak)",
+  "author": "PartyDeck",
+  "version": "1.0",
+  "info": "Minecraft Java Edition via Prism Launcher (Flatpak)\n\nThis handler uses Prism Launcher installed via Flatpak.\nSee the README.md file in this handler directory for detailed setup instructions.\n\nQuick start:\n1. Install: flatpak install flathub org.prismlauncher.PrismLauncher\n2. Create a Minecraft instance in Prism Launcher\n3. Set 'args' to: -l <your-instance-name>",
+  "path_gameroot": "",
+  "runtime": "",
+  "is32bit": false,
+  "exec": "org.prismlauncher.PrismLauncher",
+  "args": "-l YOUR_INSTANCE_NAME_HERE",
+  "env": "",
+  "pause_between_starts": 2.0,
+  "use_goldberg": false,
+  "steam_appid": null,
+  "game_null_paths": [],
+  "is_flatpak": true
+}
