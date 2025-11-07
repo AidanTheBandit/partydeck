@@ -1,0 +1,17 @@
+{
+  "name": "Minecraft (Prism Launcher - Flatpak)",
+  "author": "PartyDeck",
+  "version": "1.0",
+  "info": "Minecraft Java Edition via Prism Launcher (Flatpak)\n\nInstructions:\n1. Install Prism Launcher via Flatpak:\n   flatpak install flathub org.prismlauncher.PrismLauncher\n2. Create a Minecraft instance in Prism Launcher\n3. Set 'exec' to the Flatpak app ID: org.prismlauncher.PrismLauncher\n4. Set 'args' to launch your instance: -l <instance-name>\n5. Ensure 'is_flatpak' is set to true\n\nExample: If your instance is named 'Vanilla1.20', set args to '-l Vanilla1.20'\n\nNote: Each player can use a different Minecraft instance for separate worlds/saves.",
+  "path_gameroot": "",
+  "runtime": "",
+  "is32bit": false,
+  "exec": "org.prismlauncher.PrismLauncher",
+  "args": "-l YOUR_INSTANCE_NAME_HERE",
+  "env": "",
+  "pause_between_starts": 2.0,
+  "use_goldberg": false,
+  "steam_appid": null,
+  "game_null_paths": [],
+  "is_flatpak": true
+}
