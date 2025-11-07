@@ -320,9 +320,9 @@ pub fn launch_cmds(
         // Runtime
         if h.is_flatpak {
             // For Flatpak applications, use "flatpak run" instead of the direct executable
+            // The exec field contains the Flatpak application ID
             cmd.arg("flatpak");
             cmd.arg("run");
-            // The exec field contains the Flatpak application ID
             cmd.arg(&h.exec);
         } else if win {
             cmd.arg(&*BIN_UMU_RUN);

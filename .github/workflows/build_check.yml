@@ -1,0 +1,70 @@
+name: Build Check
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  check-rust:
+    name: Check Rust Compilation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libx11-dev
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Check compilation
+        run: cargo check --verbose
+
+      - name: Run tests
+        run: cargo test --verbose
+        continue-on-error: true
+
+  build-arch:
+    name: Full Build (Arch Linux)
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - name: Prepare
+        run: |
+          pacman-key --init
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git meson rust cargo clang glslang libcap wlroots0.18 \
+            sdl2 vulkan-headers libx11 libxmu libxcomposite libxrender libxres \
+            libxtst libxkbcommon libdrm libinput wayland-protocols benchmark \
+            xorg-xwayland pipewire cmake \
+            libavif libheif aom rav1e libdecor libxdamage \
+            luajit
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build gamescope
+        run: |
+          cd deps/gamescope
+          export CC=gcc CXX=g++
+          meson build-gcc/ -Dinput_emulation=disabled --werror --auto-features=enabled
+          ninja -C build-gcc/
+
+      - name: Build partydeck
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Check artifacts
+        run: |
+          ls -la build/
+          test -f build/partydeck || (echo "partydeck binary not found!" && exit 1)
