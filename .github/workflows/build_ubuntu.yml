@@ -26,6 +26,22 @@ jobs:
           git submodule update --init --recursive
           cd ../..
 
+      - name: Build and install Wayland 1.23
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential meson ninja-build libffi-dev libxml2-dev libexpat1-dev
+          
+          # Download and build wayland 1.23
+          cd /tmp
+          wget https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.23.0/downloads/wayland-1.23.0.tar.xz
+          tar xf wayland-1.23.0.tar.xz
+          cd wayland-1.23.0
+          
+          meson setup build --prefix=/usr
+          ninja -C build
+          sudo ninja -C build install
+          sudo ldconfig
+
       - name: Cache and Install APT packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -34,7 +50,7 @@ jobs:
             libsdl2-dev libvulkan-dev libx11-6 libx11-dev libx11-xcb-dev libxcb1 libxcb1-dev 
             libxcursor-dev libxmu-dev libxcomposite-dev libxrender-dev libxres-dev
             libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev wayland-protocols 
-            libwayland-dev xwayland libpipewire-0.3-dev cmake libavif-dev libheif-dev 
+            xwayland libpipewire-0.3-dev cmake libavif-dev libheif-dev 
             rav1e libdecor-0-dev libxxf86vm-dev hwdata libxdamage-dev libluajit-5.1-dev 
             gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip 
             libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev libxcb-composite0-dev 
@@ -48,9 +64,9 @@ jobs:
           path: |
             deps/gamescope/build-gcc
             deps/gamescope/subprojects
-          key: ${{ runner.os }}-meson-${{ hashFiles('deps/gamescope/meson.build', 'deps/gamescope/subprojects/*.wrap') }}
+          key: ${{ runner.os }}-meson-wayland123-${{ hashFiles('deps/gamescope/meson.build', 'deps/gamescope/subprojects/*.wrap') }}
           restore-keys: |
-            ${{ runner.os }}-meson-
+            ${{ runner.os }}-meson-wayland123-
 
       - name: Download Gamescope subprojects
         run: |
@@ -60,10 +76,10 @@ jobs:
 
       - name: Build Gamescope
         id: build-gamescope
-        continue-on-error: false
         run: |
           cd deps/gamescope
           export CC=gcc CXX=g++
+          export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
           meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled
           ninja -C build-gcc/
           echo "✓ Gamescope build successful"
@@ -104,6 +120,7 @@ jobs:
           echo "Commit: ${{ github.sha }}" >> release/BUILD_INFO.txt
           echo "Branch: ${{ github.ref_name }}" >> release/BUILD_INFO.txt
           echo "Runner: ${{ runner.os }}" >> release/BUILD_INFO.txt
+          echo "Wayland: 1.23.0 (custom build)" >> release/BUILD_INFO.txt
           
           # Create zip
           cd release
