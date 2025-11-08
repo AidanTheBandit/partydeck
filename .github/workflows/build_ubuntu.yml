@@ -20,6 +20,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rust-src
+
       - name: Update Gamescope submodules
         run: |
           cd deps/gamescope
@@ -49,7 +55,7 @@ jobs:
             git meson ninja-build rustc cargo clang glslang-tools libcap-dev
             libsdl2-dev libvulkan-dev libx11-6 libx11-dev libx11-xcb-dev libxcb1 libxcb1-dev 
             libxcursor-dev libxmu-dev libxcomposite-dev libxrender-dev libxres-dev
-            libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev wayland-protocols 
+            libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev
             xwayland libpipewire-0.3-dev cmake libavif-dev libheif-dev 
             rav1e libdecor-0-dev libxxf86vm-dev hwdata libxdamage-dev libluajit-5.1-dev 
             gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip 
@@ -79,7 +85,7 @@ jobs:
         run: |
           cd deps/gamescope
           export CC=gcc CXX=g++
-          export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
+          export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig
           meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled
           ninja -C build-gcc/
           echo "✓ Gamescope build successful"
