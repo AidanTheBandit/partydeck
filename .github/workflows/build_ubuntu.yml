@@ -20,10 +20,10 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Cache APT packages
-        uses: aburdenthehand/github-action-cache-apt@v1.1
+      - name: Cache and Install APT packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: |
+          packages: >
             git meson ninja-build rustc cargo clang glslang-tools libcap-dev
             libsdl2-dev libvulkan-dev libx11-6 libx11-dev libxcb1 libxcb1-dev 
             libxcursor-dev libxmu-dev libxcomposite-dev libxrender-dev libxres-dev
@@ -34,21 +34,7 @@ jobs:
             libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev libxcb-composite0-dev 
             libxcb-xfixes0-dev libseat-dev libgudev-1.0-dev libpixman-1-dev 
             libeis-dev libglm-dev
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            git meson ninja-build rustc cargo clang glslang-tools libcap-dev \
-            libsdl2-dev libvulkan-dev libx11-6 libx11-dev libxcb1 libxcb1-dev libxcursor-dev libxmu-dev \
-            libxcomposite-dev libxrender-dev libxres-dev \
-            libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev \
-            wayland-protocols libwayland-dev \
-            xwayland libpipewire-0.3-dev cmake \
-            libavif-dev libheif-dev rav1e libdecor-0-dev libxxf86vm-dev hwdata \
-            libxdamage-dev xwayland libluajit-5.1-dev gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip \
-            libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev libxcb-composite0-dev libxcb-xfixes0-dev \
-            libseat-dev libinput-dev libgudev-1.0-dev libpixman-1-dev libeis-dev libglm-dev
+          version: 1.0
 
       - name: Cache Meson build
         uses: actions/cache@v4
@@ -106,6 +92,7 @@ jobs:
           echo "Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > release/BUILD_INFO.txt
           echo "Commit: ${{ github.sha }}" >> release/BUILD_INFO.txt
           echo "Branch: ${{ github.ref_name }}" >> release/BUILD_INFO.txt
+          echo "Runner: ${{ runner.os }}" >> release/BUILD_INFO.txt
           
           # Create zip
           cd release
