@@ -37,7 +37,7 @@ jobs:
           tar xf wayland-1.23.0.tar.xz
           cd wayland-1.23.0
           
-          meson setup build --prefix=/usr
+          meson setup build --prefix=/usr -Ddocumentation=false
           ninja -C build
           sudo ninja -C build install
           sudo ldconfig
