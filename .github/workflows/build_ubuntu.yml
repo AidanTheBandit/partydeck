@@ -1,11 +1,41 @@
 name: CI (Ubuntu)
+
 on:
   workflow_dispatch:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   build:
+    name: Build PartyDeck
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
     steps:
-      - name: Prepare
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Cache APT packages
+        uses: aburdenthehand/github-action-cache-apt@v1.1
+        with:
+          packages: |
+            git meson ninja-build rustc cargo clang glslang-tools libcap-dev
+            libsdl2-dev libvulkan-dev libx11-6 libx11-dev libxcb1 libxcb1-dev 
+            libxcursor-dev libxmu-dev libxcomposite-dev libxrender-dev libxres-dev
+            libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev wayland-protocols 
+            libwayland-dev xwayland libpipewire-0.3-dev cmake libavif-dev libheif-dev 
+            rav1e libdecor-0-dev libxxf86vm-dev hwdata libxdamage-dev libluajit-5.1-dev 
+            gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip 
+            libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev libxcb-composite0-dev 
+            libxcb-xfixes0-dev libseat-dev libgudev-1.0-dev libpixman-1-dev 
+            libeis-dev libglm-dev
+
+      - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y \
@@ -20,41 +50,109 @@ jobs:
             libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev libxcb-composite0-dev libxcb-xfixes0-dev \
             libseat-dev libinput-dev libgudev-1.0-dev libpixman-1-dev libeis-dev libglm-dev
 
-      - uses: actions/checkout@v4
+      - name: Cache Meson build
+        uses: actions/cache@v4
         with:
-          submodules: recursive
+          path: |
+            deps/gamescope/build-gcc
+            deps/gamescope/subprojects
+          key: ${{ runner.os }}-meson-${{ hashFiles('deps/gamescope/meson.build', 'deps/gamescope/subprojects/*.wrap') }}
+          restore-keys: |
+            ${{ runner.os }}-meson-
 
-      - name: Build with gcc
+      - name: Build Gamescope
+        id: build-gamescope
+        continue-on-error: false
         run: |
           cd deps/gamescope
           export CC=gcc CXX=g++
-          meson build-gcc/ -Dinput_emulation=disabled -Dwrap_mode=forcefallback --auto-features=enabled
+          meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled || \
+          meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled --reconfigure
           ninja -C build-gcc/
-          ls
-          pwd
-          cd build-gcc/src
-          ls
-          pwd
+          echo "✓ Gamescope build successful"
 
-      - name: Build the rest
+      - name: Build PartyDeck
+        id: build-partydeck
         run: |
-          ls
-          pwd
           chmod +x build.sh
           ./build.sh
+          echo "✓ PartyDeck build successful"
 
-      - name: Create zip archive
+      - name: Verify build artifacts
+        run: |
+          echo "Checking for gamescope binary..."
+          test -f deps/gamescope/build-gcc/src/gamescope && echo "✓ Gamescope binary found" || exit 1
+          echo "Checking for build directory..."
+          test -d build && echo "✓ Build directory found" || exit 1
+          ls -lh deps/gamescope/build-gcc/src/gamescope
+          ls -lh build/
+
+      - name: Create release package
+        id: create-package
         run: |
           mkdir -p release
-          cp -r build/* release/
-          cp deps/gamescope/build-gcc/src/gamescope release/
+          
+          # Copy build artifacts
+          if [ -d build ]; then
+            cp -r build/* release/ 2>/dev/null || echo "No build files to copy"
+          fi
+          
+          # Copy gamescope binary
+          if [ -f deps/gamescope/build-gcc/src/gamescope ]; then
+            cp deps/gamescope/build-gcc/src/gamescope release/
+          fi
+          
+          # Create version info
+          echo "Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > release/BUILD_INFO.txt
+          echo "Commit: ${{ github.sha }}" >> release/BUILD_INFO.txt
+          echo "Branch: ${{ github.ref_name }}" >> release/BUILD_INFO.txt
+          
+          # Create zip
           cd release
-          zip -r ../built-binaries.zip .
+          zip -r ../partydeck-ubuntu-${{ github.sha }}.zip .
           cd ..
-          ls -lh built-binaries.zip
+          
+          echo "Package size: $(du -h partydeck-ubuntu-${{ github.sha }}.zip | cut -f1)"
+          echo "package_name=partydeck-ubuntu-${{ github.sha }}.zip" >> $GITHUB_OUTPUT
 
-      - name: Upload zip artifact
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: built-binaries
-          path: built-binaries.zip
+          name: partydeck-ubuntu-${{ github.sha }}
+          path: partydeck-ubuntu-${{ github.sha }}.zip
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ github.sha }}
+          path: |
+            deps/gamescope/build-gcc/meson-logs/
+            *.log
+          retention-days: 7
+
+  # Optional: Create release on tag push
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: partydeck-ubuntu-*
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: partydeck-ubuntu-*.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
