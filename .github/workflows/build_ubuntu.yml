@@ -20,12 +20,18 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Update Gamescope submodules
+        run: |
+          cd deps/gamescope
+          git submodule update --init --recursive
+          cd ../..
+
       - name: Cache and Install APT packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: >
             git meson ninja-build rustc cargo clang glslang-tools libcap-dev
-            libsdl2-dev libvulkan-dev libx11-6 libx11-dev libxcb1 libxcb1-dev 
+            libsdl2-dev libvulkan-dev libx11-6 libx11-dev libx11-xcb-dev libxcb1 libxcb1-dev 
             libxcursor-dev libxmu-dev libxcomposite-dev libxrender-dev libxres-dev
             libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev wayland-protocols 
             libwayland-dev xwayland libpipewire-0.3-dev cmake libavif-dev libheif-dev 
@@ -46,14 +52,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-meson-
 
+      - name: Download Gamescope subprojects
+        run: |
+          cd deps/gamescope
+          meson subprojects download || true
+          cd ../..
+
       - name: Build Gamescope
         id: build-gamescope
         continue-on-error: false
         run: |
           cd deps/gamescope
           export CC=gcc CXX=g++
-          meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled || \
-          meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled --reconfigure
+          meson setup build-gcc/ -Dinput_emulation=disabled --auto-features=enabled
           ninja -C build-gcc/
           echo "✓ Gamescope build successful"
 
@@ -120,7 +131,6 @@ jobs:
             *.log
           retention-days: 7
 
-  # Optional: Create release on tag push
   release:
     name: Create Release
     needs: build
