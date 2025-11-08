@@ -10,13 +10,13 @@ jobs:
           sudo apt update
           sudo apt install -y \
             git meson ninja-build rustc cargo clang glslang-tools libcap-dev \
-            libwlroots-dev libsdl2-dev vulkan-headers libx11-6 libx11-dev libxcb1 libxcb1-dev libxcursor-dev libxmu-dev \
+            libwlroots-dev libsdl2-dev libvulkan-dev libx11-6 libx11-dev libxcb1 libxcb1-dev libxcursor-dev libxmu-dev \
             libxcomposite-dev libxrender-dev libxres-dev \
             libxtst-dev libxkbcommon-dev libdrm-dev libinput-dev \
             wayland-protocols \
             xwayland libpipewire-0.3-dev cmake \
             libavif-dev libheif-dev rav1e libdecor-0-dev libxxf86vm-dev hwdata \
-            libxdamage-dev xwayland luajit-5.1-dev gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip
+            libxdamage-dev xwayland libluajit-5.1-dev gcc g++ make libbenchmark-dev libssl-dev libarchive-dev zip
 
       - uses: actions/checkout@v4
         with:
