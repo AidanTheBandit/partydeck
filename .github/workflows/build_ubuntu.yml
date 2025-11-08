@@ -28,7 +28,7 @@ jobs:
         run: |
           cd deps/gamescope
           export CC=gcc CXX=g++
-          meson build-gcc/ -Dinput_emulation=disabled -Dforce_fallback_for=wlroots --auto-features=enabled
+          meson build-gcc/ -Dinput_emulation=disabled -Dwrap_mode=forcefallback --auto-features=enabled
           ninja -C build-gcc/
           ls
           pwd
